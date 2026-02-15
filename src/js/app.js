@@ -33,22 +33,7 @@ const expenseCountElement = document.getElementById('expense-count');
 // Filter buttons
 const filterButtons = document.querySelectorAll('.btn-filter');
 
-// ============================================
-// INITIALIZE APP
-// ============================================
 
-// Set today's date as default in the date input
-dateInput.valueAsDate = new Date();
-
-// Add event listeners
-expenseForm.addEventListener('submit', handleAddExpense);
-
-// Add event listeners to filter buttons
-filterButtons.forEach(button => {
-    button.addEventListener('click', handleFilterClick);
-});
-
-console.log('💰 Expense Tracker initialized!');
 // ============================================
 // EXPENSE CLASS - Blueprint for expense objects
 // ============================================
@@ -63,6 +48,7 @@ class Expense {
         this.createdAt = new Date().toISOString();
     }
 
+    
     // Format amount as currency
     getFormattedAmount() {
         return `$${this.amount.toFixed(2)}`;
@@ -90,6 +76,70 @@ class Expense {
     }
 }
 // ============================================
+// LOCAL STORAGE FUNCTIONS
+// ============================================
+
+/**
+ * Save expenses to localStorage
+ */
+function saveToLocalStorage() {
+    try {
+        localStorage.setItem('expenses', JSON.stringify(expenses));
+        console.log('💾 Saved to localStorage:', expenses.length, 'expenses');
+    } catch (error) {
+        console.error('❌ Error saving to localStorage:', error);
+        alert('Failed to save expenses. Storage might be full.');
+    }
+}
+
+/**
+ * Load expenses from localStorage
+ */
+function loadFromLocalStorage() {
+    try {
+        const stored = localStorage.getItem('expenses');
+        
+        if (stored) {
+            // Parse JSON string back to array
+            const parsed = JSON.parse(stored);
+            
+            // Recreate Expense objects (they lost their methods when stored)
+            expenses = parsed.map(data => {
+                const expense = new Expense(
+                    data.amount,
+                    data.category,
+                    data.description,
+                    data.date
+                );
+                // Preserve the original ID and timestamps
+                expense.id = data.id;
+                expense.createdAt = data.createdAt;
+                return expense;
+            });
+            
+            console.log('📂 Loaded from localStorage:', expenses.length, 'expenses');
+        } else {
+            console.log('📂 No saved expenses found');
+        }
+    } catch (error) {
+        console.error('❌ Error loading from localStorage:', error);
+        expenses = []; // Reset to empty if there's an error
+    }
+}
+
+/**
+ * Clear all expenses (useful for testing)
+ */
+function clearAllExpenses() {
+    if (confirm('Are you sure you want to delete ALL expenses? This cannot be undone!')) {
+        expenses = [];
+        localStorage.removeItem('expenses');
+        renderExpenses();
+        updateSummary();
+        console.log('🗑️ All expenses cleared');
+    }
+}
+// ============================================
 // EVENT HANDLERS
 // ============================================
 
@@ -97,36 +147,30 @@ class Expense {
  * Handle adding a new expense
  */
 function handleAddExpense(event) {
-    // Prevent form from refreshing the page
     event.preventDefault();
 
-    // Get values from form
     const amount = amountInput.value;
     const category = categoryInput.value;
     const description = descriptionInput.value;
     const date = dateInput.value;
 
-    // Validate amount
     if (amount <= 0) {
         alert('Amount must be greater than 0!');
         return;
     }
 
-    // Create new expense object
     const expense = new Expense(amount, category, description, date);
-
-    // Add to expenses array
     expenses.push(expense);
 
-    // Update the display
+    // 💾 SAVE TO LOCALSTORAGE
+    saveToLocalStorage();
+
     renderExpenses();
     updateSummary();
 
-    // Clear the form
     expenseForm.reset();
-    dateInput.valueAsDate = new Date(); // Reset date to today
+    dateInput.valueAsDate = new Date();
 
-    // Show success feedback
     console.log('✅ Expense added:', expense);
 }
 // ============================================
@@ -186,20 +230,32 @@ function createExpenseCard(expense) {
 /**
  * Delete an expense
  */
-function deleteExpense(id) {
-    // Confirm deletion
-    if (!confirm('Are you sure you want to delete this expense?')) {
+function handleAddExpense(event) {
+    event.preventDefault();
+
+    const amount = amountInput.value;
+    const category = categoryInput.value;
+    const description = descriptionInput.value;
+    const date = dateInput.value;
+
+    if (amount <= 0) {
+        alert('Amount must be greater than 0!');
         return;
     }
 
-    // Remove from array
-    expenses = expenses.filter(exp => exp.id !== id);
+    const expense = new Expense(amount, category, description, date);
+    expenses.push(expense);
 
-    // Update display
+    // 💾 SAVE TO LOCALSTORAGE
+    saveToLocalStorage();
+
     renderExpenses();
     updateSummary();
 
-    console.log('🗑️ Expense deleted');
+    expenseForm.reset();
+    dateInput.valueAsDate = new Date();
+
+    console.log('✅ Expense added:', expense);
 }
 /**
  * Update summary statistics
@@ -242,3 +298,26 @@ function handleFilterClick(event) {
     // Re-render expenses
     renderExpenses();
 }
+// ============================================
+// INITIALIZE APP
+// ============================================
+
+// Load expenses from localStorage
+loadFromLocalStorage();''
+
+// Set today's date as default in the date input
+dateInput.valueAsDate = new Date();
+
+// Add event listeners
+expenseForm.addEventListener('submit', handleAddExpense);
+
+// Add event listeners to filter buttons
+filterButtons.forEach(button => {
+    button.addEventListener('click', handleFilterClick);
+});
+
+// Initial render
+renderExpenses();
+updateSummary();
+
+console.log('💰 Expense Tracker initialized!');
