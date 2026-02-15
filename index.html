@@ -102,12 +102,14 @@
 
         <!-- Expenses List -->
         <div class="expenses-container">
-            <h2>📋 Recent Expenses</h2>
-            <div id="expenses-list" class="expenses-list">
-                <!-- Expenses will be added here dynamically -->
-                <p class="empty-state">No expenses yet. Add your first expense above! 👆</p>
-            </div>
-        </div>
+    <div class="flex-between">
+        <h2>📋 Recent Expenses</h2>
+        <button onclick="clearAllExpenses()" class="btn-clear">🗑️ Clear All</button>
+    </div>
+    <div id="expenses-list" class="expenses-list">
+        <p class="empty-state">No expenses yet. Add your first expense above! 👆</p>
+    </div>
+</div>
 
     </div>
 
