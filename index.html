@@ -32,6 +32,20 @@
             </div>
         </div>
 
+        <!-- Category Breakdown Section -->
+<div class="category-breakdown">
+    <h2>📊 Spending by Category</h2>
+    <div id="category-bars" class="category-bars">
+        <p class="empty-state">Add expenses to see category breakdown</p>
+    </div>
+</div>
+<!-- Insights Section -->
+<div class="insights-section">
+    <h2>💡 Spending Insights</h2>
+    <div id="insights-container" class="insights-container">
+        <p class="empty-state">Add more expenses to see insights</p>
+    </div>
+</div>
         <!-- Add Expense Form -->
         <div class="form-container">
             <h2>➕ Add New Expense</h2>
@@ -104,7 +118,10 @@
         <div class="expenses-container">
     <div class="flex-between">
         <h2>📋 Recent Expenses</h2>
-        <button onclick="clearAllExpenses()" class="btn-clear">🗑️ Clear All</button>
+        <div style="display: flex; gap: 12px;">
+            <button onclick="exportToCSV()" class="btn-export">📥 Export CSV</button>
+            <button onclick="clearAllExpenses()" class="btn-clear">🗑️ Clear All</button>
+        </div>
     </div>
     <div id="expenses-list" class="expenses-list">
         <p class="empty-state">No expenses yet. Add your first expense above! 👆</p>
